@@ -1,0 +1,44 @@
+From ddf99f666c07be59ea915ea59424a361e67d0ace Mon Sep 17 00:00:00 2001
+From: Eric Timmons <etimmons@mit.edu>
+Date: Wed, 1 Mar 2017 18:55:33 -0500
+Subject: [PATCH] Source top config before determining build type.
+
+If the top config is not sourced before the build type is determined,
+the wrong build type will be chosen for the fawkes subdirectory (it
+will be constantly "fawkes").
+---
+ fawkes/etc/buildsys/config.mk | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/fawkes/etc/buildsys/config.mk b/fawkes/etc/buildsys/config.mk
+index dea5a92..1ef3d47 100644
+--- a/fawkes/etc/buildsys/config.mk
++++ b/fawkes/etc/buildsys/config.mk
+@@ -55,6 +55,11 @@ endif
+ 
+ include $(BUILDSYSDIR)/ext/gmsl
+ 
++### If we are in the fawkes sub module include the top config
++ifeq ($(SUBMODULE_INTERN),1)
++  include $(TOP_BASEDIR)/etc/buildsys/config.mk
++endif
++
+ ### Debugging related options
+ SILENTSYMB = @
+ SILENT = @
+@@ -229,12 +234,6 @@ TCYANBG		= \033[46m
+ TGREYBG		= \033[47m
+ endif
+ 
+-### If we are in the fawkes sub module include the top config 
+-ifeq ($(SUBMODULE_INTERN),1)
+-  include $(TOP_BASEDIR)/etc/buildsys/config.mk
+-endif
+-
+-
+ ### Check if there are special config files for the chosen compiler
+ ifneq ($(wildcard $(BUILDSYSDIR)/$(CC).mk),)
+   include $(BUILDSYSDIR)/$(CC).mk
+-- 
+2.12.0
+

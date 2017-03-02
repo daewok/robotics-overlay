@@ -1,0 +1,23 @@
+From 8efd29034873747f74cabb8c54263accb91ff60f Mon Sep 17 00:00:00 2001
+From: Eric Timmons <etimmons@mit.edu>
+Date: Wed, 1 Mar 2017 17:22:29 -0500
+Subject: [PATCH] Remove termcap from pkgconfig file.
+
+---
+ clips-6.pc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/clips-6.pc.in b/clips-6.pc.in
+index b208cd6..a5ae983 100644
+--- a/clips-6.pc.in
++++ b/clips-6.pc.in
+@@ -25,5 +25,5 @@ Name: clips
+ Description: CLIPS library for developing expert systems
+ Requires: 
+ Version: @PACKAGE_VERSION@
+-Libs: -lm -lncurses -ltermcap -lrt -L${libdir} -lclips
++Libs: -lm -lncurses -lrt -L${libdir} -lclips
+ Cflags: -I${includedir}/clips
+-- 
+2.12.0
+

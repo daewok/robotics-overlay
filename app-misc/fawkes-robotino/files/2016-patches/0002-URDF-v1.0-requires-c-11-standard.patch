@@ -1,0 +1,88 @@
+From fe9756ac1d104666ce023204a5e5e6c7256ac3b3 Mon Sep 17 00:00:00 2001
+From: Eric Timmons <etimmons@mit.edu>
+Date: Wed, 1 Mar 2017 11:10:03 -0500
+Subject: [PATCH 2/2] URDF v1.0 requires c++11 standard.
+
+URDF v1.0 uses things like std::stod and std::weak_pointer, which were
+introduced in c++11 standard.
+---
+ fawkes/src/libs/kdl_parser/Makefile      |  8 ++++++++
+ fawkes/src/libs/kdl_parser/kdl_parser.mk | 31 +++++++++++++++++++++++--------
+ 2 files changed, 31 insertions(+), 8 deletions(-)
+
+diff --git a/fawkes/src/libs/kdl_parser/Makefile b/fawkes/src/libs/kdl_parser/Makefile
+index 01e75c0..b6bf7c4 100644
+--- a/fawkes/src/libs/kdl_parser/Makefile
++++ b/fawkes/src/libs/kdl_parser/Makefile
+@@ -33,6 +33,12 @@ else
+   endif
+   ifneq ($(HAVE_URDFDOMHEADERS),1)
+     WARN_TARGETS += warning_urdfdomheaders
++  else
++    ifeq ($(HAVE_URDFDOMHEADERS_V1),1)
++      ifneq ($(HAVE_CPP11),1)
++        WARN_TARGETS += warning_urdfdomheaders_cpp11
++      endif
++    endif
+   endif
+   ifneq ($(HAVE_URDFDOM),1)
+     WARN_TARGETS += warning_urdfdom
+@@ -49,6 +55,8 @@ warning_kdl:
+ 	$(SILENT)echo -e "$(INDENT_PRINT)--> $(TRED)Omitting KDL parser library$(TNORMAL) (orocos-kdl[-devel] not available)"
+ warning_urdfdomheaders:
+ 	$(SILENT)echo -e "$(INDENT_PRINT)--> $(TRED)Omitting KDL parser library$(TNORMAL) (urdfdom-headers[-devel] not available)"
++warning_urdfdomheaders_cpp11:
++	$(SILENT)echo -e "$(INDENT_PRINT)--> $(TRED)Omitting KDL parser library$(TNORMAL) (cpp-11 not available)"
+ warning_urdfdom:
+ 	$(SILENT)echo -e "$(INDENT_PRINT)--> $(TRED)Omitting KDL parser library$(TNORMAL) (urdfdom[-devel] not available)"
+ warning_tinyxml:
+diff --git a/fawkes/src/libs/kdl_parser/kdl_parser.mk b/fawkes/src/libs/kdl_parser/kdl_parser.mk
+index baf72bb..6e43281 100644
+--- a/fawkes/src/libs/kdl_parser/kdl_parser.mk
++++ b/fawkes/src/libs/kdl_parser/kdl_parser.mk
+@@ -30,19 +30,34 @@ HAVE_URDFDOMHEADERS=$(if $(shell $(PKGCONFIG) --exists 'urdfdom_headers'; echo $
+ HAVE_URDFDOM=$(if $(shell $(PKGCONFIG) --exists 'urdfdom'; echo $${?/1/}),1,0)
+ HAVE_TINYXML=$(if $(wildcard $(SYSROOT)/usr/include/tinyxml.h),1,0)
+ 
++HAVE_URDFDOMHEADERS_V1=$(if $(shell $(PKGCONFIG) --atleast-version 1 'urdfdom_headers'; echo $${?/1/}),1,0)
+ 
+ ifeq ($(HAVE_KDL),1)
+   ifeq ($(HAVE_URDFDOMHEADERS),1)
+     ifeq ($(HAVE_URDFDOM),1)
+       ifeq ($(HAVE_TINYXML),1)
+-        CFLAGS_KDLPARSER = $(CFLAGS_KDL) \
+-          $(shell $(PKGCONFIG) --cflags 'urdfdom_headers') \
+-          $(shell $(PKGCONFIG) --cflags 'urdfdom')
+-        LDFLAGS_KDLPARSER = $(LDFLAGS_KDL) \
+-          $(shell $(PKGCONFIG) --libs 'urdfdom_headers') \
+-          $(shell $(PKGCONFIG) --libs 'urdfdom') \
+-          -ltinyxml
+-        HAVE_KDLPARSER=1
++		ifneq ($(HAVE_URDFDOMHEADERS_V1),1)
++	      CFLAGS_KDLPARSER = $(CFLAGS_KDL) \
++            $(shell $(PKGCONFIG) --cflags 'urdfdom_headers') \
++            $(shell $(PKGCONFIG) --cflags 'urdfdom')
++          LDFLAGS_KDLPARSER = $(LDFLAGS_KDL) \
++            $(shell $(PKGCONFIG) --libs 'urdfdom_headers') \
++            $(shell $(PKGCONFIG) --libs 'urdfdom') \
++            -ltinyxml
++          HAVE_KDLPARSER=1
++        else
++          ifeq ($(HAVE_CPP11),1)
++            CFLAGS_KDLPARSER = $(CFLAGS_KDL) \
++              $(shell $(PKGCONFIG) --cflags 'urdfdom_headers') \
++              $(shell $(PKGCONFIG) --cflags 'urdfdom') \
++              $(CFLAGS_CPP11)
++            LDFLAGS_KDLPARSER = $(LDFLAGS_KDL) \
++              $(shell $(PKGCONFIG) --libs 'urdfdom_headers') \
++              $(shell $(PKGCONFIG) --libs 'urdfdom') \
++              -ltinyxml
++            HAVE_KDLPARSER=1
++          endif
++        endif
+       endif
+     endif
+   endif
+-- 
+2.12.0
+

@@ -1,0 +1,25 @@
+From 334e7445ecbe81f073f417214328575c4aaa265d Mon Sep 17 00:00:00 2001
+From: Eric Timmons <etimmons@mit.edu>
+Date: Wed, 1 Mar 2017 17:41:00 -0500
+Subject: [PATCH] Rename XmlRpc.h to xmlrpc.h.
+
+---
+ fawkes/src/plugins/clips-ros/clips_ros_thread.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fawkes/src/plugins/clips-ros/clips_ros_thread.cpp b/fawkes/src/plugins/clips-ros/clips_ros_thread.cpp
+index dd1e327..cee35a7 100644
+--- a/fawkes/src/plugins/clips-ros/clips_ros_thread.cpp
++++ b/fawkes/src/plugins/clips-ros/clips_ros_thread.cpp
+@@ -26,7 +26,7 @@
+ #include <ros/master.h>
+ #include <ros/network.h>
+ #include <ros/xmlrpc_manager.h>
+-#include <XmlRpc.h>
++#include <xmlrpc.h>
+ 
+ #include <tuple>
+ 
+-- 
+2.12.0
+

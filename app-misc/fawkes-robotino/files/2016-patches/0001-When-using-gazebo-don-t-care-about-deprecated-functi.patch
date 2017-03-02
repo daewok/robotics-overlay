@@ -1,0 +1,25 @@
+From 1e8fbebe88a7f9f900a1b3491b7b76f6d7482806 Mon Sep 17 00:00:00 2001
+From: Eric Timmons <etimmons@mit.edu>
+Date: Wed, 1 Mar 2017 18:06:12 -0500
+Subject: [PATCH] When using gazebo, don't care about deprecated functions.
+
+---
+ fawkes/src/plugins/gazebo/gazebo.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fawkes/src/plugins/gazebo/gazebo.mk b/fawkes/src/plugins/gazebo/gazebo.mk
+index 0b57ad9..62fbba3 100644
+--- a/fawkes/src/plugins/gazebo/gazebo.mk
++++ b/fawkes/src/plugins/gazebo/gazebo.mk
+@@ -26,7 +26,7 @@ ifneq ($(PKGCONFIG),)
+ endif
+ 
+ ifeq ($(HAVE_GAZEBO),1)
+-  CFLAGS_GAZEBO  = -DHAVE_GAZEBO $(shell $(PKGCONFIG) --cflags 'gazebo')
++  CFLAGS_GAZEBO  = -DHAVE_GAZEBO $(shell $(PKGCONFIG) --cflags 'gazebo') -Wno-deprecated-declarations
+   LDFLAGS_GAZEBO = $(shell $(PKGCONFIG) --libs 'gazebo') -ldl
+ 
+   # if ffmpeg is installed, gazebo may have been compiled with support for it
+-- 
+2.12.0
+

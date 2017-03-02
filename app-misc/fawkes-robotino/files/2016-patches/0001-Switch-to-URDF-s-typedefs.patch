@@ -1,0 +1,63 @@
+From 38d8a801d2aed59215e6bb8e98a3ca5a2d279fd1 Mon Sep 17 00:00:00 2001
+From: Eric Timmons <etimmons@mit.edu>
+Date: Wed, 1 Mar 2017 10:40:12 -0500
+Subject: [PATCH 1/2] Switch to URDF's typedefs.
+
+Instead of using raw boost::shared_ptr's for URDF API, use URDF's
+typedefs instead. This also allows compilation with both URDF v0.4 and
+v1.0 (where they changed to std::shared_ptr's).
+---
+ fawkes/src/libs/kdl_parser/kdl_parser.cpp | 8 ++++----
+ fawkes/src/libs/kdl_parser/model.cpp      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/fawkes/src/libs/kdl_parser/kdl_parser.cpp b/fawkes/src/libs/kdl_parser/kdl_parser.cpp
+index 4cbbcdc..1e14294 100644
+--- a/fawkes/src/libs/kdl_parser/kdl_parser.cpp
++++ b/fawkes/src/libs/kdl_parser/kdl_parser.cpp
+@@ -90,7 +90,7 @@ Frame to_kdl(urdf::Pose p)
+ }
+ 
+ // construct joint
+-Joint to_kdl(boost::shared_ptr<urdf::Joint> jnt)
++Joint to_kdl(urdf::JointSharedPtr jnt)
+ {
+   Frame F_parent_jnt = to_kdl(jnt->parent_to_joint_origin_transform);
+ 
+@@ -119,7 +119,7 @@ Joint to_kdl(boost::shared_ptr<urdf::Joint> jnt)
+ }
+ 
+ // construct inertia
+-RigidBodyInertia to_kdl(boost::shared_ptr<urdf::Inertial> i)
++RigidBodyInertia to_kdl(urdf::InertialSharedPtr i)
+ {
+   Frame origin = to_kdl(i->origin);
+   // kdl specifies the inertia in the reference frame of the link, the urdf specifies the inertia in the inertia reference frame
+@@ -128,9 +128,9 @@ RigidBodyInertia to_kdl(boost::shared_ptr<urdf::Inertial> i)
+ 
+ 
+ // recursive function to walk through tree
+-bool add_children_to_tree(boost::shared_ptr<const urdf::Link> root, Tree& tree)
++bool add_children_to_tree(urdf::LinkConstSharedPtr root, Tree& tree)
+ {
+-  std::vector<boost::shared_ptr<urdf::Link> > children = root->child_links;
++  std::vector<urdf::LinkSharedPtr> children = root->child_links;
+   //ROS_DEBUG("Link %s had %i children", root->name.c_str(), (int)children.size());
+ 
+   // constructs the optional inertia
+diff --git a/fawkes/src/libs/kdl_parser/model.cpp b/fawkes/src/libs/kdl_parser/model.cpp
+index ed3ca98..6879e5f 100644
+--- a/fawkes/src/libs/kdl_parser/model.cpp
++++ b/fawkes/src/libs/kdl_parser/model.cpp
+@@ -151,7 +151,7 @@ bool Model::initXml(TiXmlElement *robot_xml)
+  */
+ bool Model::initString(const std::string& xml_string)
+ {
+-  boost::shared_ptr<ModelInterface> model;
++  urdf::ModelInterfaceSharedPtr model;
+ 
+   if( IsColladaData(xml_string) ) {
+     // currently, support for Collada is not implemented
+-- 
+2.12.0
+
